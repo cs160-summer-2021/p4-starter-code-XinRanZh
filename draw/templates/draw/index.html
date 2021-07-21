@@ -36,6 +36,7 @@
 
     tool.onMouseMove = function(event) { //http://paperjs.org/reference/tool/ path examples
        path.add(event.point);
+       console.log(event.point);
        // You may need to add code here if you want to pass any other information.
        socket.send("{\"x\" : " + event.point.x + ", \"y\" : " + event.point.y + ", \"uid\" : " + uid + "}" );
     }
@@ -44,6 +45,7 @@
         var received = JSON.parse(receivedMessage.data);
         console.log("Received: " + JSON.stringify(received));
         // You will probably want to add some code here to draw more lines.
+        path.add(received)
     }
 
     socket.onclose = function(e) {
