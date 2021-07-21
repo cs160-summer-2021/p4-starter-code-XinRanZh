@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>P4 Drawing</title>
@@ -14,19 +15,25 @@
     </style>
 
 </head>
+
 <body>
     <!-- You may change the dimensions of this canvas -->
     <canvas id="myCanvas" width="750px" height="750px"></canvas>
 </body>
 <script>
-
     // setting up the canvas and one paper tool
     var canvas = document.getElementById('myCanvas');
     paper.setup(canvas);
     var tool = new paper.Tool();
-    var path = new paper.Path();
-    var uid = Date.now() % 10000;
-    path.strokeColor = "red";
+    var colorname = ["red", "yellow", "blue", "green", "purple", "black"];
+    var totalUsers = 6;
+    var uid = Math.floor(Math.random() * totalUsers)
+    var pathdic = {};
+
+    for (let uid = 0; uid < totalUsers; uid++) {
+        // create a path for each user
+        pathdic[uid] = new paper.Path();
+    }
 
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
@@ -34,21 +41,26 @@
     var socket = new WebSocket(
         'ws://' + window.location.host + '/ws/draw');
 
+    console.log(typeof(pathdic[0]))
     tool.onMouseMove = function(event) { //http://paperjs.org/reference/tool/ path examples
-       path.add(event.point);
-       // You may need to add code here if you want to pass any other information.
-       socket.send("{\"x\" : " + event.point.x + ", \"y\" : " + event.point.y + ", \"uid\" : " + uid + "}" );
+        // You may need to add code here if you want to pass any other information.
+        socket.send("{\"x\" : " + event.point.x + ", \"y\" : " + event.point.y + ", \"uid\" : " + uid + "}");
     }
 
     socket.onmessage = function(receivedMessage) {
         var received = JSON.parse(receivedMessage.data);
-        console.log("Received: " + JSON.stringify(received));
+        // console.log("Received: " + JSON.stringify(received));
+
         // You will probably want to add some code here to draw more lines.
+        let path = pathdic[received.uid.toString()];
+        path.add(received)
+        path.strokeColor = colorname[received.uid];
+        path.strokeWidth = 5;
     }
 
     socket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
     };
-
 </script>
+
 </html>
