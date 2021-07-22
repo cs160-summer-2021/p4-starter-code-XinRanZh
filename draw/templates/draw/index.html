@@ -41,8 +41,11 @@
     var socket = new WebSocket(
         'ws://' + window.location.host + '/ws/draw');
 
-    console.log(typeof(pathdic[0]))
     tool.onMouseMove = function(event) { //http://paperjs.org/reference/tool/ path examples
+        let path = pathdic[uid];
+        path.add(event.point)
+        path.strokeColor = colorname[uid];
+        path.strokeWidth = 5;
         // You may need to add code here if you want to pass any other information.
         socket.send("{\"x\" : " + event.point.x + ", \"y\" : " + event.point.y + ", \"uid\" : " + uid + "}");
     }
@@ -52,10 +55,12 @@
         // console.log("Received: " + JSON.stringify(received));
 
         // You will probably want to add some code here to draw more lines.
-        let path = pathdic[received.uid.toString()];
-        path.add(received)
-        path.strokeColor = colorname[received.uid];
-        path.strokeWidth = 5;
+        if (received.uid != uid) {
+            let path = pathdic[received.uid];
+            path.add(received)
+            path.strokeColor = colorname[received.uid];
+            path.strokeWidth = 5;
+        }
     }
 
     socket.onclose = function(e) {
