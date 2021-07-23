@@ -37,6 +37,7 @@
 
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
+    
 
     var socket = new WebSocket(
         'ws://' + window.location.host + '/ws/draw');
@@ -55,12 +56,15 @@
         // console.log("Received: " + JSON.stringify(received));
 
         // You will probably want to add some code here to draw more lines.
-        if (received.uid != uid) {
+        if (url.endsWith("large")) {
+            if (received.uid != uid) {
             let path = pathdic[received.uid];
             path.add(received)
             path.strokeColor = colorname[received.uid];
             path.strokeWidth = 5;
         }
+        }
+
     }
 
     socket.onclose = function(e) {
